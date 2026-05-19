@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DeathZore制式抽奖机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-lime: #39ff14;
+            --neon-violet: #bf00ff;
+            --neon-yellow: #fff01f;
+            --bg-dark: #050505;
+            --panel-bg: rgba(20, 20, 30, 0.7);
+        }
+        * { 
+            font-family: 'Noto Sans SC', sans-serif; 
+            box-sizing: border-box;
+        }
+        .font-cyber { font-family: 'Orbitron', 'Noto Sans SC', sans-serif; }
+        html, body {
+            background: var(--bg-dark);
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        /* 动态背景 */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .bg-glow {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(191, 0, 255, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+        /* 霓虹标题动画 */
+        .neon-title {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-lime), var(--neon-violet), var(--neon-cyan));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 5s ease infinite, neon-flicker 3s infinite alternate;
+            filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes neon-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+                filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.6)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.4));
+            }
+            20%, 24%, 55% {
+                opacity: 0.95;
+                filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.3)) drop-shadow(0 0 20px rgba(255, 0, 255, 0.2));
+            }
+        }
+        /* 霓虹按钮 */
+        .neon-btn {
+            position: relative;
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 1rem 3rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .neon-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.6), inset 0 0 20px rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+            color: #fff;
+            text-shadow: 0 0 10px #fff;
+        }
+        .neon-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        .neon-btn:hover::before { left: 100%; }
+        .neon-btn-pink {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3), inset 0 0 10px rgba(255, 0, 255, 0.1);
+        }
+        .neon-btn-pink:hover {
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.6), inset 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+        .neon-btn-lime {
+            border-color: var(--neon-lime);
+            color: var(--neon-lime);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), inset 0 0 10px rgba(57, 255, 20, 0.1);
+        }
+        .neon-btn-lime:hover {
+            background: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.6), inset 0 0 20px rgba(57, 255, 20, 0.2);
+        }
+        .neon-btn-yellow {
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+            box-shadow: 0 0 10px rgba(255, 240, 31, 0.3), inset 0 0 10px rgba(255, 240, 31, 0.1);
+        }
+        .neon-btn-yellow:hover {
+            background: rgba(255, 240, 31, 0.1);
+            box-shadow: 0 0 30px rgba(255, 240, 31, 0.6), inset 0 0 20px rgba(255, 240, 31, 0.2);
+        }
+        .neon-btn-sm {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+        }
+        /* 玻璃面板 */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .glass-panel-cyan {
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        /* 输入框 */
+        .neon-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            transition: all 0.3s;
+            width: 100%;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .neon-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        /* 列表项 */
+        .item-row {
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .item-row:hover {
+            background: rgba(0, 243, 255, 0.05);
+            border-left-color: var(--neon-cyan);
+        }
+        /* 抽奖结果动画 */
+        .draw-result {
+            animation: result-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes result-pop {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .rolling-text {
+            animation: rolling-flash 0.1s linear infinite;
+        }
+        @keyframes rolling-flash {
+            0%, 100% { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
+            50% { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
+        }
+        /* 滚动条 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+        /* 页面切换 - 使用display:none/block */
+        .page {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+        }
+        .page.active {
+            display: block;
+        }
+        /* 库存卡片 */
+        .inventory-card {
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .inventory-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.2);
+        }
+        /* 结果标签 */
+        .result-tag {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(191, 0, 255, 0.2));
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* 抽奖按钮组 */
+        .draw-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+        .draw-btn-group button {
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+        }
+        /* 粒子画布 */
+        #particleCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
+        }
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .data-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+        .data-table td {
+            color: #e0e0e0;
+        }
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            .neon-title {
+                font-size: 2rem;
+            }
+            .draw-btn-group button {
+                min-width: 100px;
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+            }
+            .inventory-card {
+                padding: 1rem;
+            }
+        }
+        /* 头部导航 */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        /* 容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+        /* 工具类 */
+        .text-cyan-glow {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        .text-pink-glow {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+        .col-span-2 { grid-column: span 2 / span 2; }
+        .col-span-8 { grid-column: span 8 / span 8; }
+        .col-span-10 { grid-column: span 10 / span 10; }
+        .col-span-12 { grid-column: span 12 / span 12; }
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .flex-1 { flex: 1 1 0%; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .min-h-screen { min-height: 100vh; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .top-0 { top: 0; }
+        .right-0 { right: 0; }
+        .z-10 { z-index: 10; }
+        .z-40 { z-index: 40; }
+        .z-50 { z-index: 50; }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+        .rounded-full { border-radius: 9999px; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-white-10 { border-color: rgba(255, 255, 255, 0.1); }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+        .pt-4 { padding-top: 1rem; }
+        .pb-4 { padding-bottom: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: monospace; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .text-white { color: #ffffff; }
+        .text-white-20 { color: rgba(255, 255, 255, 0.2); }
+        .text-white-30 { color: rgba(255, 255, 255, 0.3); }
+        .text-white-40 { color: rgba(255, 255, 255, 0.4); }
+        .text-white-50 { color: rgba(255, 255, 255, 0.5); }
+        .text-white-60 { color: rgba(255, 255, 255, 0.6); }
+        .text-white-70 { color: rgba(255, 255, 255, 0.7); }
+        .text-cyan-300-70 { color: rgba(103, 232, 249, 0.7); }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-fuchsia-400 { color: #e879f9; }
+        .text-fuchsia-500 { color: #d946ef; }
+        .text-lime-400 { color: #a3e635; }
+        .text-red-400 { color: #f87171; }
+        .text-red-300 { color: #fca5a5; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-colors { transition-property: color; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .underline { text-decoration-line: underline; }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:text-5xl { font-size: 3rem; }
+            .md\:text-6xl { font-size: 3.75rem; }
+            .md\:text-7xl { font-size: 4.5rem; }
+            .md\:flex-row { flex-direction: row; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <canvas id="particleCanvas"></canvas>
+    <!-- ==================== 页面1: 封面 ==================== -->
+    <div id="page-landing" class="page active">
+        <div class="min-h-screen flex flex-col items-center justify-center px-4">
+            <div class="text-center">
+                <h1 class="neon-title mb-4">DeathZore<br>制式抽奖机</h1>
+                <p class="text-cyan-300-70 text-lg mb-12 tracking-widest font-cyber">SYSTEM READY // NEON PROTOCOL ACTIVE</p>
+                <button onclick="app.goHome()" class="neon-btn font-cyber">
+                    进入主页
+                </button>
+            </div>
+            <div class="absolute bottom-8 text-white-20 text-sm font-cyber tracking-wider">DEATHZORE INDUSTRIES // V.1.1.2</div>
+        </div>
+    </div>
+    <!-- ==================== 页面2: 主页/库存列表 ==================== -->
+    <div id="page-home" class="page">
+        <header class="app-header">
+            <div class="container flex items-center justify-between py-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl font-cyber font-bold" style="background: linear-gradient(to right, #22d3ee, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DEATHZORE</span>
+                    <span class="text-xs text-white-40 border border-white-10 px-2 py-1 rounded-full">抽奖系统</span>
+                </div>
+                <button onclick="app.goLanding()" class="text-sm text-white-50 hover:text-cyan-400 transition-colors">返回封面</button>
+            </div>
+        </header>
+        <main class="container py-8">
+            <div class="flex flex-col items-end mb-8">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2 w-full mb-4">
+                    <span style="width: 8px; height: 32px; background: #22d3ee; border-radius: 9999px; box-shadow: 0 0 10px #00f3ff;"></span>
+                    库存管理
+                </h2>
+                <button onclick="app.openCreateModal()" class="neon-btn neon-btn-sm mb-4">
+                    + 创建库存
+                </button>
+                <!-- 导入按钮移至此处，与创建按钮保持间距 -->
+                <button onclick="app.importData()" class="neon-btn neon-btn-sm neon-btn-pink">
+                    ↓ 导入JSON
+                </button>
+            </div>
+            <div id="inventoryList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 动态生成 -->
+            </div>
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-white-30">
+                <svg class="w-20 h-20 mb-4" style="opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                <p class="text-lg">暂无库存</p>
+                <p class="text-sm mt-2">点击上方按钮创建第一个抽奖库存或导入已有数据</p>
+            </div>
+        </main>
+    </div>
+    <!-- ==================== 页面3: 编辑器 ==================== -->
+    <div id="page-editor" class="page">
+        <header class="app-header">
+            <div class="container flex items-center justify-between py-4">
+                <div class="flex items-center gap-4">
+                    <button onclick="app.goHome()" class="text-white-50 hover:text-cyan-400 transition-colors">&larr; 返回</button>
+                    <h2 class="text-xl font-bold text-white">编辑库存</h2>
+                </div>
+                <button onclick="app.saveAndReturn()" class="neon-btn neon-btn-lime neon-btn-sm">完成</button>
+            </div>
+        </header>
+        <main class="container py-8">
+            <!-- 基本信息 -->
+            <div class="glass-panel glass-panel-cyan rounded-2xl p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">库存名称 *</label>
+                        <input type="text" id="invName" class="neon-input" placeholder="输入名称，如：班级点名、活动抽奖">
+                    </div>
+                    <div>
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">编号上限 (1-10000)</label>
+                        <input type="number" id="invMax" class="neon-input" value="1000" min="1" max="10000">
+                    </div>
+                </div>
+                <!-- 加密保护选项 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-3 mb-2">
+                        <input type="checkbox" id="enablePassword" class="w-4 h-4 accent-cyan-400" onchange="app.togglePasswordField()">
+                        <label for="enablePassword" class="text-cyan-400 text-sm font-bold cursor-pointer">启用编辑密码保护（可选）</label>
+                    </div>
+                    <input type="password" id="invPassword" class="neon-input hidden" placeholder="设置编辑密码，留空则不加密">
+                    <p class="text-xs text-white-30 mt-2">启用后，再次编辑此库存需要输入密码，抽奖功能不受影响</p>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-white-50">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #a3e635;"></span>
+                    编号自动生成 · 当前已录入 <span id="itemCount" class="text-cyan-400 font-bold">0</span> 条
+                </div>
+            </div>
+            <!-- 添加条目 -->
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="text-cyan-400">+</span> 添加条目
+                </h3>
+                <div class="flex gap-3">
+                    <input type="text" id="entryName" class="neon-input flex-1" placeholder="输入人名或条目名称，回车快速添加" onkeypress="if(event.key==='Enter')app.addEntry()">
+                    <button onclick="app.addEntry()" class="neon-btn neon-btn-sm whitespace-nowrap">添加</button>
+                </div>
+                <p class="text-xs text-white-30 mt-2">编号按顺序自动生成，无需手动输入</p>
+            </div>
+            <!-- 条目列表 -->
+            <div class="glass-panel rounded-2xl p-6 mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-white">条目列表</h3>
+                    <button onclick="app.clearAll()" class="text-xs text-red-400 hover:text-red-300 transition-colors border border-red-400/30 px-3 py-1 rounded-xl">清空全部</button>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-white-10">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">编号</th>
+                                <th>名称</th>
+                                <th style="width: 60px; text-align: right;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entryList">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 导出功能移至此处，底部中央 -->
+            <div class="flex justify-center gap-4">
+                <button onclick="app.exportCurrentInventory()" class="neon-btn neon-btn-sm neon-btn-yellow">
+                    导出此库存
+                </button>
+                <button onclick="app.exportAllData()" class="neon-btn neon-btn-sm">
+                    导出全部备份
+                </button>
+            </div>
+        </main>
+    </div>
+    <!-- ==================== 页面4: 抽奖页 ==================== -->
+    <div id="page-draw" class="page">
+        <header class="app-header">
+            <div class="container flex items-center justify-between py-4">
+                <div class="flex items-center gap-4">
+                    <button onclick="app.goHome()" class="text-white-50 hover:text-cyan-400 transition-colors">&larr; 返回</button>
+                    <div>
+                        <h2 class="text-xl font-bold text-white" id="drawTitle">库存名称</h2>
+                        <p class="text-xs text-white-50">共 <span id="drawCount" class="text-cyan-400">0</span> 个条目</p>
+                    </div>
+                </div>
+                <button onclick="app.goEditFromDraw()" class="text-sm text-white-50 hover:text-cyan-400 transition-colors border border-white-10 px-3 py-1 rounded-xl">编辑库存</button>
+            </div>
+        </header>
+        <main class="container py-8 flex flex-col items-center">
+            <!-- 抽奖显示区 -->
+            <div class="w-full glass-panel glass-panel-cyan rounded-3xl p-8 mb-8" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                <div id="drawDisplay" class="text-center" style="z-index: 10;">
+                    <p class="text-white-50 text-sm mb-2 tracking-widest">READY TO DRAW</p>
+                    <div class="text-4xl md:text-6xl font-cyber font-bold text-white-20">???</div>
+                </div>
+                <div id="rollingOverlay" class="hidden" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 20;">
+                    <div class="text-5xl md:text-7xl font-cyber font-bold rolling-text" id="rollingText">ROLLING</div>
+                </div>
+            </div>
+            <!-- 结果区 -->
+            <div id="resultArea" class="w-full hidden flex-col gap-3 mb-8">
+                <!-- 动态生成结果 -->
+            </div>
+            <!-- 按钮组 -->
+            <div class="draw-btn-group">
+                <button onclick="app.draw(1)" class="neon-btn">
+                    单抽
+                </button>
+                <button onclick="app.draw(10)" class="neon-btn neon-btn-pink">
+                    十连抽
+                </button>
+                <button onclick="app.draw(50)" class="neon-btn neon-btn-lime">
+                    五十连抽
+                </button>
+                <!-- 自定义抽奖按钮 -->
+                <button onclick="app.openCustomDrawModal()" class="neon-btn neon-btn-yellow">
+                    自定义
+                </button>
+            </div>
+            <button onclick="app.resetDraw()" id="resetBtn" class="hidden mt-6 text-sm text-white-30 hover:text-white-60 transition-colors underline">
+                重置结果
+            </button>
+        </main>
+    </div>
+    <!-- ==================== 创建库存弹窗 ==================== -->
+    <div id="createModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-white mb-2">创建新库存</h3>
+            <p class="text-white-50 text-sm mb-6">命名后即可开始添加抽奖条目</p>
+            <input type="text" id="newInvName" class="neon-input mb-6" placeholder="输入库存名称（留空默认为“自定义1”）">
+            <div class="flex gap-3">
+                <button onclick="app.closeModal()" class="flex-1 py-3 rounded-xl border border-white-10 text-white-70 hover:bg-white/5 transition-colors">取消</button>
+                <button onclick="app.confirmCreate()" class="flex-1 neon-btn py-3 rounded-xl" style="padding: 0.75rem;">确认创建</button>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== 密码验证弹窗 ==================== -->
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-white mb-2">需要验证密码</h3>
+            <p class="text-white-50 text-sm mb-6">此库存已设置编辑保护，请输入密码</p>
+            <input type="password" id="passwordInput" class="neon-input mb-4" placeholder="输入编辑密码">
+            <p id="passwordError" class="text-red-400 text-sm mb-6 hidden">密码错误，请重试</p>
+            <div class="flex gap-3">
+                <button onclick="app.closePasswordModal()" class="flex-1 py-3 rounded-xl border border-white-10 text-white-70 hover:bg-white/5 transition-colors">取消</button>
+                <button onclick="app.verifyPassword()" class="flex-1 neon-btn py-3 rounded-xl" style="padding: 0.75rem;">确认</button>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== 自定义抽奖弹窗 ==================== -->
+    <div id="customDrawModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-white mb-2">自定义抽奖数量</h3>
+            <p class="text-white-50 text-sm mb-6">输入您想要一次抽取的条目数量</p>
+            <input type="number" id="customDrawCount" class="neon-input mb-6" min="1" max="10000" value="25" placeholder="输入数量">
+            <div class="flex gap-3">
+                <button onclick="app.closeCustomDrawModal()" class="flex-1 py-3 rounded-xl border border-white-10 text-white-70 hover:bg-white/5 transition-colors">取消</button>
+                <button onclick="app.executeCustomDraw()" class="flex-1 neon-btn neon-btn-yellow py-3 rounded-xl" style="padding: 0.75rem;">开始抽奖</button>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== 导入文件输入框（隐藏） ==================== -->
+    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="app.handleImportFile(event)">
+    
+    <script>
+        // ==================== 粒子背景 ====================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.color = ['#00f3ff', '#ff00ff', '#39ff14', '#bf00ff'][Math.floor(Math.random() * 4)];
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+        // ==================== 应用逻辑 ====================
+        const app = {
+            data: { inventories: [] },
+            currentId: null,
+            editingId: null,
+            tempEntries: [],
+            pendingEditId: null, // 用于密码验证后跳转
+            init() {
+                const saved = localStorage.getItem('dz_lottery_v1');
+                if (saved) {
+                    try { this.data = JSON.parse(saved); } catch(e) {
+                        console.error('读取本地数据失败，已重置为空白状态', e);
+                        this.data = { inventories: [] };
+                    }
+                }
+                this.renderDashboard();
+                // 修复：模态框ESC关闭事件监听
+                this.initModalCloseHandlers();
+            },
+            initModalCloseHandlers() {
+                // 所有模态框按ESC关闭
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                            modal.classList.remove('active');
+                        });
+                        // 清空所有残留状态
+                        this.pendingEditId = null;
+                    }
+                });
+                
+                // 点击模态框背景关闭
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.classList.remove('active');
+                            this.pendingEditId = null;
+                        }
+                    });
+                });
+            },
+            save() {
+                try {
+                    localStorage.setItem('dz_lottery_v1', JSON.stringify(this.data));
+                } catch(e) {
+                    console.error('保存数据失败', e);
+                    alert('保存失败：本地存储可能已满');
+                }
+            },
+            switchPage(pageId) {
+                document.querySelectorAll('.page').forEach(el => {
+                    el.classList.remove('active');
+                });
+                document.getElementById(pageId).classList.add('active');
+                window.scrollTo(0, 0);
+            },
+            goLanding() { this.switchPage('page-landing'); },
+            goHome() { 
+                // 清空编辑状态，防止返回后残留
+                this.editingId = null;
+                this.tempEntries = [];
+                this.renderDashboard(); 
+                this.switchPage('page-home'); 
+            },
+            renderDashboard() {
+                const list = document.getElementById('inventoryList');
+                const empty = document.getElementById('emptyState');
+                list.innerHTML = '';
+                if (!this.data.inventories || this.data.inventories.length === 0) {
+                    empty.classList.remove('hidden');
+                    empty.style.display = 'flex';
+                    return;
+                }
+                empty.classList.add('hidden');
+                empty.style.display = 'none';
+                this.data.inventories.forEach(inv => {
+                    const card = document.createElement('div');
+                    card.className = 'inventory-card';
+                    // 显示加密状态
+                    const lockIcon = inv.password ? '<span class="text-yellow-400 text-xs" title="已加密">🔒</span>' : '';
+                    card.innerHTML = `
+                        <div style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background: linear-gradient(to bottom right, rgba(0,243,255,0.1), rgba(191,0,255,0.1)); border-radius: 50%; filter: blur(20px); margin-top: -40px; margin-right: -40px;"></div>
+                        <div style="position: relative; z-index: 10;">
+                            <div class="flex items-start justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white truncate" style="padding-right: 0.5rem;">${inv.name} ${lockIcon}</h3>
+                                <button onclick="app.deleteInventory('${inv.id}')" class="text-white-20 hover:text-red-400 transition-colors text-sm" style="background: none; border: none; cursor: pointer;">&times;</button>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-white-50 mb-6">
+                                <span class="flex items-center gap-1"><span style="width: 6px; height: 6px; border-radius: 50%; background: #22d3ee;"></span>${inv.items.length} 条目</span>
+                                <span class="flex items-center gap-1"><span style="width: 6px; height: 6px; border-radius: 50%; background: #e879f9;"></span>上限 ${inv.maxNumber}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="app.goDraw('${inv.id}')" class="flex-1 neon-btn neon-btn-sm text-center" style="display: block;">抽奖</button>
+                                <button onclick="app.goEdit('${inv.id}')" class="flex-1 border border-white-10 hover:border-cyan-400/50 hover:text-cyan-400 text-white-60 py-2 px-4 rounded-xl text-sm transition-all" style="background: transparent; cursor: pointer;">编辑</button>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            },
+            openCreateModal() {
+                document.getElementById('createModal').classList.add('active');
+                document.getElementById('newInvName').value = '';
+                document.getElementById('newInvName').focus();
+            },
+            closeModal() {
+                document.getElementById('createModal').classList.remove('active');
+            },
+            confirmCreate() {
+                let name = document.getElementById('newInvName').value.trim();
+                if (!name) {
+                    const existing = this.data.inventories.filter(i => i.name.startsWith('自定义'));
+                    name = '自定义' + (existing.length + 1);
+                }
+                const newInv = {
+                    id: 'inv_' + Date.now(),
+                    name: name,
+                    maxNumber: 1000,
+                    items: [],
+                    password: null // 密码字段
+                };
+                this.data.inventories.push(newInv);
+                this.save();
+                this.closeModal();
+                this.goEdit(newInv.id);
+            },
+            deleteInventory(id) {
+                if (!confirm('确定删除此库存？此操作不可撤销')) return;
+                this.data.inventories = this.data.inventories.filter(i => i.id !== id);
+                this.save();
+                this.renderDashboard();
+            },
+            // 密码相关方法
+            goEdit(id) {
+                const inv = this.data.inventories.find(i => i.id === id);
+                if (!inv) return;
+                
+                // 检查是否有密码保护
+                if (inv.password) {
+                    this.pendingEditId = id;
+                    this.openPasswordModal();
+                    return;
+                }
+                
+                this.editingId = id;
+                this.loadEditorData();
+                this.switchPage('page-editor');
+            },
+            loadEditorData() {
+                const inv = this.data.inventories.find(i => i.id === this.editingId);
+                if (!inv) return;
+                document.getElementById('invName').value = inv.name;
+                document.getElementById('invMax').value = inv.maxNumber;
+                // 加载密码状态
+                const passwordCheckbox = document.getElementById('enablePassword');
+                const passwordField = document.getElementById('invPassword');
+                if (inv.password) {
+                    passwordCheckbox.checked = true;
+                    passwordField.classList.remove('hidden');
+                    passwordField.value = inv.password;
+                } else {
+                    passwordCheckbox.checked = false;
+                    passwordField.classList.add('hidden');
+                    passwordField.value = '';
+                }
+                this.tempEntries = JSON.parse(JSON.stringify(inv.items));
+                this.renderEntries();
+            },
+            togglePasswordField() {
+                const checkbox = document.getElementById('enablePassword');
+                const passwordField = document.getElementById('invPassword');
+                if (checkbox.checked) {
+                    passwordField.classList.remove('hidden');
+                    passwordField.focus();
+                } else {
+                    passwordField.classList.add('hidden');
+                    passwordField.value = '';
+                }
+            },
+            openPasswordModal() {
+                document.getElementById('passwordModal').classList.add('active');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('passwordInput').focus();
+            },
+            closePasswordModal() {
+                document.getElementById('passwordModal').classList.remove('active');
+                this.pendingEditId = null;
+            },
+            verifyPassword() {
+                const inputPassword = document.getElementById('passwordInput').value;
+                const inv = this.data.inventories.find(i => i.id === this.pendingEditId);
+                
+                if (inv && inv.password === inputPassword) {
+                    this.editingId = this.pendingEditId;
+                    this.closePasswordModal();
+                    this.loadEditorData();
+                    this.switchPage('page-editor');
+                } else {
+                    document.getElementById('passwordError').classList.remove('hidden');
+                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('passwordInput').focus();
+                }
+            },
+            goEditFromDraw() {
+                this.goEdit(this.currentId);
+            },
+            renderEntries() {
+                const list = document.getElementById('entryList');
+                const count = document.getElementById('itemCount');
+                count.textContent = this.tempEntries.length;
+                list.innerHTML = '';
+                if (this.tempEntries.length === 0) {
+                    list.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="text-center text-white-20 text-sm" style="padding: 2rem;">
+                                暂无条目，请在上方添加
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                this.tempEntries.forEach((item, idx) => {
+                    const row = document.createElement('tr');
+                    row.className = 'item-row';
+                    row.innerHTML = `
+                        <td class="text-cyan-400 font-mono font-bold">${item.number}</td>
+                        <td class="text-white">${item.name}</td>
+                        <td class="text-right">
+                            <button onclick="app.removeEntry(${idx})" class="text-white-20 hover:text-red-400 transition-colors text-sm" style="background: none; border: none; cursor: pointer;">删除</button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+            },
+            addEntry() {
+                const name = document.getElementById('entryName').value.trim();
+                if (!name) return;
+                const maxNum = parseInt(document.getElementById('invMax').value) || 1000;
+                const usedNumbers = this.tempEntries.map(e => e.number);
+                let nextNum = 1;
+                while (usedNumbers.includes(nextNum) && nextNum <= maxNum) nextNum++;
+                if (nextNum > maxNum) {
+                    alert('已达到编号上限 ' + maxNum);
+                    return;
+                }
+                this.tempEntries.push({ number: nextNum, name: name });
+                document.getElementById('entryName').value = '';
+                document.getElementById('entryName').focus();
+                this.renderEntries();
+            },
+            removeEntry(idx) {
+                this.tempEntries.splice(idx, 1);
+                this.renderEntries();
+            },
+            clearAll() {
+                if (!confirm('确定清空所有条目？此操作不可撤销')) return;
+                this.tempEntries = [];
+                this.renderEntries();
+            },
+            saveAndReturn() {
+                const inv = this.data.inventories.find(i => i.id === this.editingId);
+                if (!inv) return;
+                inv.name = document.getElementById('invName').value.trim() || inv.name;
+                let maxNum = parseInt(document.getElementById('invMax').value) || 1000;
+                if (maxNum < 1) maxNum = 1;
+                if (maxNum > 10000) maxNum = 10000;
+                inv.maxNumber = maxNum;
+                // 保存密码
+                const passwordCheckbox = document.getElementById('enablePassword');
+                if (passwordCheckbox.checked) {
+                    inv.password = document.getElementById('invPassword').value.trim() || null;
+                } else {
+                    inv.password = null;
+                }
+                inv.items = JSON.parse(JSON.stringify(this.tempEntries));
+                this.save();
+                this.goHome();
+            },
+            goDraw(id) {
+                const inv = this.data.inventories.find(i => i.id === id);
+                if (!inv) return;
+                this.currentId = id;
+                document.getElementById('drawTitle').textContent = inv.name;
+                document.getElementById('drawCount').textContent = inv.items.length;
+                document.getElementById('drawDisplay').innerHTML = `
+                    <p class="text-white-50 text-sm mb-2 tracking-widest">READY TO DRAW</p>
+                    <div class="text-4xl md:text-6xl font-cyber font-bold text-white-20">???</div>
+                `;
+                const area = document.getElementById('resultArea');
+                area.classList.add('hidden');
+                area.innerHTML = '';
+                document.getElementById('resetBtn').classList.add('hidden');
+                this.switchPage('page-draw');
+            },
+            draw(count) {
+                const inv = this.data.inventories.find(i => i.id === this.currentId);
+                if (!inv || inv.items.length === 0) {
+                    alert('库存为空，无法抽取');
+                    return;
+                }
+                const pool = JSON.parse(JSON.stringify(inv.items));
+                if (count > pool.length) count = pool.length;
+                if (count < 1) count = 1;
+                // 打乱抽取
+                const shuffled = pool.sort(() => Math.random() - 0.5);
+                const results = shuffled.slice(0, count);
+                // 动画
+                const overlay = document.getElementById('rollingOverlay');
+                const rollingText = document.getElementById('rollingText');
+                overlay.classList.remove('hidden');
+                let rollCount = 0;
+                const maxRoll = 20;
+                const interval = setInterval(() => {
+                    const randomItem = pool[Math.floor(Math.random() * pool.length)];
+                    rollingText.textContent = randomItem.name;
+                    rollCount++;
+                    if (rollCount >= maxRoll) {
+                        clearInterval(interval);
+                        overlay.classList.add('hidden');
+                        this.showResults(results);
+                    }
+                }, 80);
+            },
+            // 自定义抽奖相关方法
+            openCustomDrawModal() {
+                document.getElementById('customDrawModal').classList.add('active');
+                document.getElementById('customDrawCount').value = '25';
+                document.getElementById('customDrawCount').focus();
+                document.getElementById('customDrawCount').select();
+            },
+            closeCustomDrawModal() {
+                document.getElementById('customDrawModal').classList.remove('active');
+            },
+            executeCustomDraw() {
+                const inputValue = document.getElementById('customDrawCount').value.trim();
+                const count = parseInt(inputValue);
+                
+                // 增强输入验证
+                if (isNaN(count) || count < 1 || !/^\d+$/.test(inputValue)) {
+                    alert('请输入有效的正整数（至少1个）');
+                    document.getElementById('customDrawCount').value = '25';
+                    document.getElementById('customDrawCount').focus();
+                    return;
+                }
+                
+                this.closeCustomDrawModal();
+                this.draw(count);
+            },
+            showResults(results) {
+                const display = document.getElementById('drawDisplay');
+                const area = document.getElementById('resultArea');
+                const resetBtn = document.getElementById('resetBtn');
+                if (results.length === 1) {
+                    display.innerHTML = `
+                        <p class="text-cyan-400 text-sm mb-2 tracking-widest font-bold">RESULT</p>
+                        <div class="text-5xl md:text-7xl font-cyber font-bold text-white mb-2 draw-result" style="text-shadow: 0 0 30px rgba(0,243,255,0.5)">${results[0].name}</div>
+                        <div class="text-white-40 text-lg font-mono">NO. ${results[0].number}</div>
+                    `;
+                    area.classList.add('hidden');
+                } else {
+                    display.innerHTML = `
+                        <p class="text-fuchsia-400 text-sm mb-2 tracking-widest font-bold">MULTI DRAW &times; ${results.length}</p>
+                        <div class="text-3xl md:text-5xl font-cyber font-bold text-white-20">COMPLETE</div>
+                    `;
+                    area.innerHTML = '';
+                    area.classList.remove('hidden');
+                    area.style.display = 'flex';
+                    results.forEach((item, idx) => {
+                        const tag = document.createElement('div');
+                        tag.className = 'result-tag draw-result';
+                        tag.style.animationDelay = (idx * 0.05) + 's';
+                        tag.innerHTML = `
+                            <span class="text-white font-bold">${item.name}</span>
+                            <span class="text-cyan-400 font-mono text-sm">NO. ${item.number}</span>
+                        `;
+                        area.appendChild(tag);
+                    });
+                }
+                resetBtn.classList.remove('hidden');
+            },
+            resetDraw() {
+                const inv = this.data.inventories.find(i => i.id === this.currentId);
+                if (!inv) return;
+                document.getElementById('drawDisplay').innerHTML = `
+                    <p class="text-white-50 text-sm mb-2 tracking-widest">READY TO DRAW</p>
+                    <div class="text-4xl md:text-6xl font-cyber font-bold text-white-20">???</div>
+                `;
+                const area = document.getElementById('resultArea');
+                area.classList.add('hidden');
+                area.innerHTML = '';
+                document.getElementById('resetBtn').classList.add('hidden');
+            },
+            // 导入导出相关方法（修复版）
+            exportAllData() {
+                if (!this.data.inventories || this.data.inventories.length === 0) {
+                    alert('没有可导出的数据');
+                    return;
+                }
+                
+                try {
+                    const dataStr = JSON.stringify(this.data, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `DeathZore抽奖机_全部备份_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('导出失败', e);
+                    alert('导出失败：生成文件时出错');
+                }
+            },
+            exportCurrentInventory() {
+                if (!this.editingId) {
+                    alert('请先选择一个库存进行编辑');
+                    return;
+                }
+                
+                const inv = this.data.inventories.find(i => i.id === this.editingId);
+                if (!inv) {
+                    alert('库存不存在或已被删除');
+                    return;
+                }
+                
+                try {
+                    const dataStr = JSON.stringify(inv, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `DeathZore抽奖机_${inv.name}_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('导出失败', e);
+                    alert('导出失败：生成文件时出错');
+                }
+            },
+            importData() {
+                document.getElementById('importFileInput').click();
+            },
+            handleImportFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // 判断是单个库存还是全部备份
+                        if (importedData.inventories && Array.isArray(importedData.inventories)) {
+                            // 全部备份导入
+                            if (confirm('检测到完整备份文件，导入将覆盖当前所有数据。确定继续？')) {
+                                this.data = importedData;
+                                this.save();
+                                this.goHome(); // 修复：确保导入后刷新页面
+                                alert('导入成功！所有数据已恢复');
+                            }
+                        } else if (importedData.id && importedData.name && Array.isArray(importedData.items)) {
+                            // 单个库存导入
+                            if (confirm(`检测到单个库存"${importedData.name}"，确定导入？`)) {
+                                // 生成新ID避免冲突
+                                importedData.id = 'inv_' + Date.now();
+                                // 确保密码字段存在
+                                if (!importedData.hasOwnProperty('password')) {
+                                    importedData.password = null;
+                                }
+                                this.data.inventories.push(importedData);
+                                this.save();
+                                this.renderDashboard(); // 修复：确保导入后刷新列表
+                                alert(`导入成功！库存"${importedData.name}"已添加`);
+                            }
+                        } else {
+                            throw new Error('无效的文件格式');
+                        }
+                    } catch (err) {
+                        console.error('导入失败', err);
+                        alert('导入失败：文件格式无效或已损坏');
+                    }
+                    
+                    // 重置文件输入
+                    event.target.value = '';
+                };
+                reader.onerror = () => {
+                    alert('导入失败：无法读取文件');
+                    event.target.value = '';
+                };
+                reader.readAsText(file);
+            }
+        };
+        app.init();
+        
+        // 回车键支持
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') app.verifyPassword();
+        });
+        document.getElementById('customDrawCount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') app.executeCustomDraw();
+        });
+        document.getElementById('newInvName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') app.confirmCreate();
+        });
+    </script>
+</body>
+</html>
