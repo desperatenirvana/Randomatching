@@ -29,7 +29,6 @@
             margin: 0;
             padding: 0;
         }
-        /* 动态背景 */
         .bg-grid {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +53,6 @@
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
             50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
         }
-        /* 霓虹标题动画 */
         .neon-title {
             font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
             font-weight: 900;
@@ -84,7 +82,6 @@
                 filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.3)) drop-shadow(0 0 20px rgba(255, 0, 255, 0.2));
             }
         }
-        /* 霓虹按钮 */
         .neon-btn {
             position: relative;
             background: transparent;
@@ -152,7 +149,6 @@
             padding: 0.5rem 1.5rem;
             font-size: 0.875rem;
         }
-        /* 玻璃面板 */
         .glass-panel {
             background: var(--panel-bg);
             backdrop-filter: blur(12px);
@@ -164,7 +160,6 @@
             border: 1px solid rgba(0, 243, 255, 0.3);
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.5);
         }
-        /* 输入框 */
         .neon-input {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(0, 243, 255, 0.3);
@@ -182,7 +177,6 @@
             border-color: var(--neon-cyan);
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
         }
-        /* 列表项 */
         .item-row {
             transition: all 0.2s;
             border-left: 3px solid transparent;
@@ -191,7 +185,6 @@
             background: rgba(0, 243, 255, 0.05);
             border-left-color: var(--neon-cyan);
         }
-        /* 抽奖结果动画 */
         .draw-result {
             animation: result-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -206,12 +199,10 @@
             0%, 100% { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
             50% { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
         }
-        /* 滚动条 */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
-        /* 页面切换 - 使用display:none/block */
         .page {
             display: none;
             min-height: 100vh;
@@ -220,7 +211,6 @@
         .page.active {
             display: block;
         }
-        /* 库存卡片 */
         .inventory-card {
             transition: all 0.3s;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -237,7 +227,6 @@
             border-color: var(--neon-cyan);
             box-shadow: 0 10px 40px rgba(0, 243, 255, 0.2);
         }
-        /* 结果标签 */
         .result-tag {
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(191, 0, 255, 0.2));
             border: 1px solid rgba(0, 243, 255, 0.4);
@@ -248,7 +237,6 @@
             align-items: center;
             justify-content: space-between;
         }
-        /* 抽奖按钮组 */
         .draw-btn-group {
             display: flex;
             flex-wrap: wrap;
@@ -263,7 +251,6 @@
             min-width: 120px;
             max-width: 200px;
         }
-        /* 粒子画布 */
         #particleCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -271,7 +258,6 @@
             z-index: -1;
             pointer-events: none;
         }
-        /* 模态框 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -299,7 +285,6 @@
             max-width: 400px;
             box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
         }
-        /* 表格样式 */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -319,7 +304,6 @@
         .data-table td {
             color: #e0e0e0;
         }
-        /* 响应式调整 */
         @media (max-width: 640px) {
             .neon-title {
                 font-size: 2rem;
@@ -333,7 +317,6 @@
                 padding: 1rem;
             }
         }
-        /* 头部导航 */
         .app-header {
             position: sticky;
             top: 0;
@@ -344,14 +327,12 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        /* 容器 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
             width: 100%;
         }
-        /* 工具类 */
         .text-cyan-glow {
             color: var(--neon-cyan);
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
@@ -484,7 +465,7 @@
                     进入主页
                 </button>
             </div>
-            <div class="absolute bottom-8 text-white-20 text-sm font-cyber tracking-wider">DEATHZORE INDUSTRIES // V.1.1.2</div>
+            <div class="absolute bottom-8 text-white-20 text-sm font-cyber tracking-wider">DEATHZORE INDUSTRIES // V.1.1.3</div>
         </div>
     </div>
     <!-- ==================== 页面2: 主页/库存列表 ==================== -->
@@ -499,16 +480,16 @@
             </div>
         </header>
         <main class="container py-8">
-            <div class="flex flex-col items-end mb-8">
+            <div class="flex flex-col items-center mb-8">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2 w-full mb-4">
                     <span style="width: 8px; height: 32px; background: #22d3ee; border-radius: 9999px; box-shadow: 0 0 10px #00f3ff;"></span>
                     库存管理
                 </h2>
-                <button onclick="app.openCreateModal()" class="neon-btn neon-btn-sm mb-4">
+                <button onclick="app.openCreateModal()" class="neon-btn neon-btn-sm mb-4 w-full" style="max-width: 400px;">
                     + 创建库存
                 </button>
                 <!-- 导入按钮移至此处，与创建按钮保持间距 -->
-                <button onclick="app.importData()" class="neon-btn neon-btn-sm neon-btn-pink">
+                <button onclick="app.importData()" class="neon-btn neon-btn-sm neon-btn-pink w-full" style="max-width: 400px;">
                     ↓ 导入JSON
                 </button>
             </div>
@@ -660,7 +641,7 @@
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-white mb-2">创建新库存</h3>
             <p class="text-white-50 text-sm mb-6">命名后即可开始添加抽奖条目</p>
-            <input type="text" id="newInvName" class="neon-input mb-6" placeholder="输入库存名称（留空默认为“自定义1”）">
+            <input type="text" id="newInvName" class="neon-input mb-6" placeholder="输入库存名称（留空默认为"自定义1"）">
             <div class="flex gap-3">
                 <button onclick="app.closeModal()" class="flex-1 py-3 rounded-xl border border-white-10 text-white-70 hover:bg-white/5 transition-colors">取消</button>
                 <button onclick="app.confirmCreate()" class="flex-1 neon-btn py-3 rounded-xl" style="padding: 0.75rem;">确认创建</button>
@@ -745,7 +726,7 @@
             currentId: null,
             editingId: null,
             tempEntries: [],
-            pendingEditId: null, // 用于密码验证后跳转
+            pendingEditId: null,
             init() {
                 const saved = localStorage.getItem('dz_lottery_v1');
                 if (saved) {
@@ -755,22 +736,17 @@
                     }
                 }
                 this.renderDashboard();
-                // 修复：模态框ESC关闭事件监听
                 this.initModalCloseHandlers();
             },
             initModalCloseHandlers() {
-                // 所有模态框按ESC关闭
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         document.querySelectorAll('.modal-overlay.active').forEach(modal => {
                             modal.classList.remove('active');
                         });
-                        // 清空所有残留状态
                         this.pendingEditId = null;
                     }
                 });
-                
-                // 点击模态框背景关闭
                 document.querySelectorAll('.modal-overlay').forEach(modal => {
                     modal.addEventListener('click', (e) => {
                         if (e.target === modal) {
@@ -797,7 +773,6 @@
             },
             goLanding() { this.switchPage('page-landing'); },
             goHome() { 
-                // 清空编辑状态，防止返回后残留
                 this.editingId = null;
                 this.tempEntries = [];
                 this.renderDashboard(); 
@@ -809,15 +784,12 @@
                 list.innerHTML = '';
                 if (!this.data.inventories || this.data.inventories.length === 0) {
                     empty.classList.remove('hidden');
-                    empty.style.display = 'flex';
                     return;
                 }
                 empty.classList.add('hidden');
-                empty.style.display = 'none';
                 this.data.inventories.forEach(inv => {
                     const card = document.createElement('div');
                     card.className = 'inventory-card';
-                    // 显示加密状态
                     const lockIcon = inv.password ? '<span class="text-yellow-400 text-xs" title="已加密">🔒</span>' : '';
                     card.innerHTML = `
                         <div style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background: linear-gradient(to bottom right, rgba(0,243,255,0.1), rgba(191,0,255,0.1)); border-radius: 50%; filter: blur(20px); margin-top: -40px; margin-right: -40px;"></div>
@@ -858,7 +830,7 @@
                     name: name,
                     maxNumber: 1000,
                     items: [],
-                    password: null // 密码字段
+                    password: null
                 };
                 this.data.inventories.push(newInv);
                 this.save();
@@ -871,18 +843,14 @@
                 this.save();
                 this.renderDashboard();
             },
-            // 密码相关方法
             goEdit(id) {
                 const inv = this.data.inventories.find(i => i.id === id);
                 if (!inv) return;
-                
-                // 检查是否有密码保护
                 if (inv.password) {
                     this.pendingEditId = id;
                     this.openPasswordModal();
                     return;
                 }
-                
                 this.editingId = id;
                 this.loadEditorData();
                 this.switchPage('page-editor');
@@ -892,7 +860,6 @@
                 if (!inv) return;
                 document.getElementById('invName').value = inv.name;
                 document.getElementById('invMax').value = inv.maxNumber;
-                // 加载密码状态
                 const passwordCheckbox = document.getElementById('enablePassword');
                 const passwordField = document.getElementById('invPassword');
                 if (inv.password) {
@@ -929,9 +896,8 @@
                 this.pendingEditId = null;
             },
             verifyPassword() {
-                const inputPassword = document.getElementById('passwordInput').value;
+                const inputPassword = document.getElementById('passwordInput').value.trim();
                 const inv = this.data.inventories.find(i => i.id === this.pendingEditId);
-                
                 if (inv && inv.password === inputPassword) {
                     this.editingId = this.pendingEditId;
                     this.closePasswordModal();
@@ -1007,10 +973,13 @@
                 if (maxNum < 1) maxNum = 1;
                 if (maxNum > 10000) maxNum = 10000;
                 inv.maxNumber = maxNum;
-                // 保存密码
+                // 保存密码 - 修复：勾选密码但输入为空时保留旧密码，避免误触丢失
                 const passwordCheckbox = document.getElementById('enablePassword');
+                const passwordInput = document.getElementById('invPassword').value.trim();
                 if (passwordCheckbox.checked) {
-                    inv.password = document.getElementById('invPassword').value.trim() || null;
+                    if (passwordInput) {
+                        inv.password = passwordInput;
+                    }
                 } else {
                     inv.password = null;
                 }
@@ -1043,10 +1012,8 @@
                 const pool = JSON.parse(JSON.stringify(inv.items));
                 if (count > pool.length) count = pool.length;
                 if (count < 1) count = 1;
-                // 打乱抽取
                 const shuffled = pool.sort(() => Math.random() - 0.5);
                 const results = shuffled.slice(0, count);
-                // 动画
                 const overlay = document.getElementById('rollingOverlay');
                 const rollingText = document.getElementById('rollingText');
                 overlay.classList.remove('hidden');
@@ -1063,7 +1030,6 @@
                     }
                 }, 80);
             },
-            // 自定义抽奖相关方法
             openCustomDrawModal() {
                 document.getElementById('customDrawModal').classList.add('active');
                 document.getElementById('customDrawCount').value = '25';
@@ -1076,15 +1042,12 @@
             executeCustomDraw() {
                 const inputValue = document.getElementById('customDrawCount').value.trim();
                 const count = parseInt(inputValue);
-                
-                // 增强输入验证
-                if (isNaN(count) || count < 1 || !/^\d+$/.test(inputValue)) {
+                if (isNaN(count) || count < 1 || !/^\\d+$/.test(inputValue)) {
                     alert('请输入有效的正整数（至少1个）');
                     document.getElementById('customDrawCount').value = '25';
                     document.getElementById('customDrawCount').focus();
                     return;
                 }
-                
                 this.closeCustomDrawModal();
                 this.draw(count);
             },
@@ -1132,13 +1095,11 @@
                 area.innerHTML = '';
                 document.getElementById('resetBtn').classList.add('hidden');
             },
-            // 导入导出相关方法（修复版）
             exportAllData() {
                 if (!this.data.inventories || this.data.inventories.length === 0) {
                     alert('没有可导出的数据');
                     return;
                 }
-                
                 try {
                     const dataStr = JSON.stringify(this.data, null, 2);
                     const blob = new Blob([dataStr], { type: 'application/json' });
@@ -1160,13 +1121,11 @@
                     alert('请先选择一个库存进行编辑');
                     return;
                 }
-                
                 const inv = this.data.inventories.find(i => i.id === this.editingId);
                 if (!inv) {
                     alert('库存不存在或已被删除');
                     return;
                 }
-                
                 try {
                     const dataStr = JSON.stringify(inv, null, 2);
                     const blob = new Blob([dataStr], { type: 'application/json' });
@@ -1189,34 +1148,47 @@
             handleImportFile(event) {
                 const file = event.target.files[0];
                 if (!file) return;
-                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
                         const importedData = JSON.parse(e.target.result);
-                        
-                        // 判断是单个库存还是全部备份
                         if (importedData.inventories && Array.isArray(importedData.inventories)) {
-                            // 全部备份导入
                             if (confirm('检测到完整备份文件，导入将覆盖当前所有数据。确定继续？')) {
-                                this.data = importedData;
+                                const sanitizedData = {
+                                    inventories: (importedData.inventories || []).map(inv => ({
+                                        id: inv.id || ('inv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)),
+                                        name: inv.name || '未命名库存',
+                                        maxNumber: inv.maxNumber || 1000,
+                                        items: Array.isArray(inv.items) ? inv.items.map((item, idx) => ({
+                                            number: item.number || (idx + 1),
+                                            name: item.name || '未命名条目'
+                                        })) : [],
+                                        password: inv.hasOwnProperty('password') ? inv.password : null
+                                    }))
+                                };
+                                this.data = sanitizedData;
                                 this.save();
-                                this.goHome(); // 修复：确保导入后刷新页面
-                                alert('导入成功！所有数据已恢复');
+                                this.goHome();
+                                alert(`导入成功！已恢复 ${sanitizedData.inventories.length} 个库存`);
                             }
                         } else if (importedData.id && importedData.name && Array.isArray(importedData.items)) {
-                            // 单个库存导入
-                            if (confirm(`检测到单个库存"${importedData.name}"，确定导入？`)) {
-                                // 生成新ID避免冲突
+                            if (confirm(`检测到单个库存\"${importedData.name}\"，确定导入？`)) {
                                 importedData.id = 'inv_' + Date.now();
-                                // 确保密码字段存在
-                                if (!importedData.hasOwnProperty('password')) {
-                                    importedData.password = null;
-                                }
-                                this.data.inventories.push(importedData);
+                                const sanitizedInv = {
+                                    id: importedData.id,
+                                    name: importedData.name || '未命名库存',
+                                    maxNumber: importedData.maxNumber || 1000,
+                                    items: Array.isArray(importedData.items) ? importedData.items : [],
+                                    password: importedData.hasOwnProperty('password') ? importedData.password : null
+                                };
+                                sanitizedInv.items = sanitizedInv.items.map((item, idx) => ({
+                                    number: item.number || (idx + 1),
+                                    name: item.name || '未命名条目'
+                                }));
+                                this.data.inventories.push(sanitizedInv);
                                 this.save();
-                                this.renderDashboard(); // 修复：确保导入后刷新列表
-                                alert(`导入成功！库存"${importedData.name}"已添加`);
+                                this.renderDashboard();
+                                alert(`导入成功！库存\"${sanitizedInv.name}\"已添加（${sanitizedInv.items.length}条条目）`);
                             }
                         } else {
                             throw new Error('无效的文件格式');
@@ -1225,8 +1197,6 @@
                         console.error('导入失败', err);
                         alert('导入失败：文件格式无效或已损坏');
                     }
-                    
-                    // 重置文件输入
                     event.target.value = '';
                 };
                 reader.onerror = () => {
@@ -1237,8 +1207,6 @@
             }
         };
         app.init();
-        
-        // 回车键支持
         document.getElementById('passwordInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') app.verifyPassword();
         });
